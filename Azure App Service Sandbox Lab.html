@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Azure App Service Sandbox Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f2f1;--card:#fff;--tx:#201f1e;--mut:#605e5c;--bd:#c8c6c4;--pri:#0078d4;--priH:#106ebe;--top:#1b1a19;--ok:#107c10;--err:#a4262c;--hint:#fff4ce;--hintb:#c19c00;--sel:#eff6fc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a19;--card:#292827;--tx:#f3f2f1;--mut:#a19f9d;--bd:#4a4846;--pri:#4ba0e8;--priH:#6cb8f6;--top:#000;--ok:#6bb700;--err:#f1707b;--hint:#3b3a1f;--hintb:#c19c00;--sel:#25313b}}
+:root[data-theme="dark"]{--bg:#1b1a19;--card:#292827;--tx:#f3f2f1;--mut:#a19f9d;--bd:#4a4846;--pri:#4ba0e8;--priH:#6cb8f6;--top:#000;--ok:#6bb700;--err:#f1707b;--hint:#3b3a1f;--hintb:#c19c00;--sel:#25313b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;padding-bottom:110px}
+button,input,select{font:inherit;color:inherit}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:0 14px;height:48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--top);z-index:30}
+.brand{font-weight:600;cursor:pointer;white-space:nowrap}
+.sw{position:relative;flex:1;max-width:560px}
+.sw input{width:100%;height:32px;border:0;border-radius:3px;padding:0 10px;background:#3b3a39;color:#fff}
+.sw input::placeholder{color:#c8c6c4}
+.dd{position:absolute;top:36px;left:0;right:0;background:var(--card);color:var(--tx);border:1px solid var(--bd);box-shadow:0 6px 18px #0004;display:none}
+.dd div{padding:8px 12px;cursor:pointer}.dd div:hover{background:var(--sel)}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px}
+h1{font-size:22px;margin:0 0 4px;font-weight:600}h2{font-size:16px;margin:18px 0 8px;font-weight:600}
+.mut{color:var(--mut)}.crumb{color:var(--pri);cursor:pointer}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid transparent;padding:14px 6px;text-align:center;cursor:pointer;border-radius:4px}
+.tile:hover{border-color:var(--pri);background:var(--sel)}.tile i{display:block;font-size:26px;font-style:normal;margin-bottom:4px}
+.btn{background:var(--pri);color:#fff;border:1px solid var(--pri);padding:6px 16px;border-radius:2px;cursor:pointer}
+.btn:hover{background:var(--priH)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.s{background:var(--card);color:var(--tx);border-color:var(--bd)}.btn.s:hover{background:var(--sel)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.menu{position:relative}.menu .pop{position:absolute;top:34px;left:0;background:var(--card);border:1px solid var(--bd);min-width:200px;box-shadow:0 6px 18px #0004;z-index:5}
+.menu .pop div{padding:9px 14px;cursor:pointer}.menu .pop div:hover{background:var(--sel)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:4px;padding:16px 20px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--bd);overflow-x:auto;margin:12px 0 16px}
+.tabs a{padding:8px 14px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;color:var(--mut)}
+.tabs a.on{color:var(--pri);border-color:var(--pri);font-weight:600}
+.r{display:grid;grid-template-columns:230px minmax(0,1fr);gap:8px 16px;margin:12px 0;align-items:start}
+.r>label{padding-top:5px}.req:after{content:" *";color:var(--err)}
+.in{width:100%;max-width:460px;height:32px;padding:0 8px;border:1px solid var(--bd);background:var(--card);border-radius:2px}
+.in:focus{outline:2px solid var(--pri)}.bad{border-color:var(--err)}
+.err{color:var(--err);font-size:12px;margin-top:2px}.ok{color:var(--ok)}
+.opt{display:flex;gap:18px;flex-wrap:wrap;padding-top:4px}.opt label{cursor:pointer;display:flex;gap:6px;align-items:center}
+.note{background:var(--sel);border-left:3px solid var(--pri);padding:8px 12px;margin:10px 0;max-width:760px}
+.warn{background:var(--hint);border-left:3px solid var(--hintb);padding:8px 12px;margin:10px 0}
+.foot{position:sticky;bottom:96px;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px;display:flex;gap:8px;margin:20px -16px 0}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid var(--bd);padding:8px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+.split{display:grid;grid-template-columns:230px minmax(0,1fr);gap:0;min-height:60vh}
+.side{background:var(--card);border-right:1px solid var(--bd);padding:8px 0}
+.side div{padding:7px 16px;cursor:pointer}.side div:hover{background:var(--sel)}.side div.on{background:var(--sel);color:var(--pri);font-weight:600}
+.side b{display:block;padding:10px 16px 2px;color:var(--mut);font-size:12px;font-weight:600}
+.main{padding:16px 22px;min-width:0}
+@media(max-width:760px){.split{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--bd)}.r{grid-template-columns:1fr}.r>label{padding-top:0}}
+.drop{border:2px dashed var(--bd);border-radius:4px;padding:30px;text-align:center;cursor:pointer;background:var(--card)}
+.drop:hover,.drop.on{border-color:var(--pri);background:var(--sel)}
+.prog{height:6px;background:var(--bd);border-radius:3px;overflow:hidden}.prog span{display:block;height:100%;background:var(--pri);transition:width .4s}
+.st{display:flex;gap:10px;align-items:center;padding:6px 0}.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--bd);flex:none;text-align:center;font-size:11px;line-height:14px}
+.dot.run{border-color:var(--pri);border-top-color:transparent;animation:sp .8s linear infinite}.dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+@keyframes sp{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.dot.run{animation:none}}
+pre{background:#1b1a19;color:#d2d0ce;padding:10px;border-radius:3px;max-height:180px;overflow:auto;font:12px/1.5 Consolas,monospace;white-space:pre-wrap}
+.coach{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:25;max-width:900px;margin:0 auto;background:var(--hint);border:1px solid var(--hintb);border-radius:6px;padding:10px 14px;box-shadow:0 6px 20px #0005;display:flex;gap:12px;align-items:flex-start}
+.coach .n{background:var(--hintb);color:#000;border-radius:12px;padding:0 9px;font-weight:600;white-space:nowrap}
+.coach button{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--mut)}
+.modal{position:fixed;inset:0;background:#0008;z-index:40;display:flex;align-items:center;justify-content:center;padding:16px}
+.browser{background:var(--card);width:min(760px,100%);border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.url{background:var(--bg);padding:8px 12px;display:flex;gap:8px;align-items:center;font-size:12px;overflow-wrap:anywhere}
+.page{padding:48px 24px;text-align:center}
+.toast{position:fixed;top:60px;right:16px;z-index:50;background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--pri);padding:10px 14px;box-shadow:0 6px 18px #0004;max-width:300px}
+.ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px 30px}.ess div{padding:4px 0;border-bottom:1px solid var(--bd);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+</style></head><body>
+<div class="top"><span class="brand" onclick="go('home')">Microsoft Azure</span>
+<div class="sw"><input id="q" placeholder="Search resources, services, and docs (G+/)" oninput="srch(this.value)" autocomplete="off"><div class="dd" id="dd"></div></div>
+<span style="margin-left:auto;font-size:12px;white-space:nowrap" id="usr">student@lab.onmicrosoft.com</span></div>
+<div id="v"></div>
+<div class="coach" id="coach"></div>
+<script>
+const HASH="dhhvaafmcja6dtbv",SUB="basic subscription",SUBID="3767a93a-231d-47fb-8e4b-3186ac904ed1";
+const SV=[["Create a resource","➕"],["App Services","🌐"],["Virtual machines","🖥️"],["Storage accounts","🗄️"],["SQL databases","🛢️"],["Azure Cosmos DB","🪐"],["Resource groups","📦"],["All resources","📚"],["Function App","⚡"],["Key vaults","🔑"],["Virtual networks","🕸️"],["Kubernetes services","☸️"]];
+const SKU={"Free F1 (shared)":0,"Basic B1 (1.75 GB memory, 1 vCPU)":13.14,"Standard S1 (1.75 GB memory, 1 vCPU)":69.35,"Premium V3 P0V3 (4 GB memory, 1 vCPU)":56.58};
+const TABS=["Basics","Database","Deployment","Networking","Monitor + secure","Tags","Review + create"];
+const S={sub:"",rg:"",name:"",publish:"",rt:"",os:"",region:"",plan:"",sku:"",zone:"",db:false,cd:"",basic:"",pub:"",vnet:"",ai:"",def:false,tags:[{n:"",v:""}]};
+const REQ=[["sub","Subscription",0],["rg","Resource Group",0],["name","Name",0],["publish","Publish",0],["rt","Runtime stack",0],["os","Operating System",0],["region","Region",0],["plan","App Service plan",0],["sku","Pricing plan",0],["zone","Zone redundancy",0],["cd","Continuous deployment",2],["basic","Basic authentication",2],["pub","Enable public access",3],["vnet","Enable virtual network integration",3],["ai","Enable Application Insights",4]];
+function missing(){const m=REQ.filter(r=>!S[r[0]]).map(r=>[r[1]+" has no value",r[2]]);const e=S.name&&nameErr();if(e)m.push(["Name: "+e,0]);return m}
+function pk(k,v){set(k,v)}
+let RGL=[],PL=[];
+function ask(t,l,ok,val,extra){const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="card" style="width:min(440px,100%)"><h2 style="margin-top:0">${t}</h2>${extra||""}<label>${l}</label><input class="in" id="ai" style="max-width:none;margin:4px 0"><div class="err" id="ae"></div><div class="bar"><button class="btn" id="aok">OK</button><button class="btn s" id="acx">Cancel</button></div></div>`;document.body.append(m);const i=m.querySelector("#ai");i.focus();const g=()=>{const v=i.value.trim(),e=val(v),x=m.querySelector("#cl");if(e){m.querySelector("#ae").textContent=e;return}m.remove();ok(v,x&&x.value)};m.querySelector("#aok").onclick=g;m.querySelector("#acx").onclick=()=>m.remove();i.onkeydown=e=>{if(e.key=="Enter")g()}}
+function newRG(){ask("Create new resource group","Name",v=>{if(!RGL.includes(v))RGL.push(v);S.rg=v;render()},v=>!v?"Name is required.":(!/^[A-Za-z0-9_().-]{1,90}$/.test(v)||v.endsWith("."))?"Use letters, numbers, underscores, periods, parentheses, or hyphens. Can’t end with a period.":"")}
+function newPlan(){if(!S.os||!S.region){toast("Choose Operating System and Region first.");return}ask("Create new App Service plan","Name",v=>{if(!PL.includes(v))PL.push(v);S.plan=v;render()},v=>!/^[A-Za-z0-9-]{1,40}$/.test(v)?"Use 1–40 letters, numbers, or hyphens.":"")}
+function planOpts(){const g=S.os&&S.region?"ASP-"+(S.rg||"appservice")+"-9e40":"";return [...new Set([g,...PL].filter(Boolean))].map(x=>`<option value="${x}" ${S.plan==x?"selected":""}>(New) ${x}</option>`).join("")}
+let view="home",tab=0,sec="overview",created=false,hints=true,visited=new Set();
+const $=s=>document.querySelector(s);
+const nameErr=()=>!S.name?"Name is required.":!/^[a-z0-9]([a-z0-9-]{0,58}[a-z0-9])?$/.test(S.name)?"Use 2–60 lowercase letters, numbers, or hyphens. No leading or trailing hyphen.":"";
+function go(x){view=x;render();scrollTo(0,0)}
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2600)}
+function na(){toast("That part of the portal isn’t used in this lab. Follow the yellow guide at the bottom.")}
+function srch(q){const d=$("#dd");const m=SV.filter(s=>q&&s[0].toLowerCase().includes(q.toLowerCase()));d.style.display=m.length?"block":"none";d.innerHTML=m.map(s=>`<div onclick="pick('${s[0]}')">${s[1]} ${s[0]}</div>`).join("")}
+function pick(n){$("#dd").style.display="none";$("#q").value="";n=="App Services"?go("list"):n=="Resource groups"||n=="All resources"?go("rgs"):na()}
+function set(k,v){S[k]=v;render()}
+function radios(k,o){return `<div class="opt">${o.map(x=>`<label><input type="radio" name="${k}" ${S[k]===x?"checked":""} onchange="set('${k}','${x}')">${x}</label>`).join("")}</div>`}
+function sel(k,o){return `<select class="in" onchange="pk('${k}',this.value)"><option value="" ${S[k]?"":"selected"}>Select…</option>${o.map(x=>`<option ${S[k]===x?"selected":""}>${x}</option>`).join("")}</select>`}
+const row=(l,c,r)=>`<div class="r"><label class="${r?"req":""}">${l}</label><div>${c}</div></div>`;
+function price(){return ((SKU[S.sku]||0)*(S.zone=="Enabled"?2:1)).toFixed(2)}
+function hint(){
+ if(view=="home"||view=="all")return [1,"Find <b>App Services</b>. Type it in the top search bar, or click the <b>App Services</b> tile under Azure services."];
+ if(view=="list")return [2,"Click <b>+ Create</b> and choose <b>Web App</b>."];
+ if(view=="create"){const t=[[3,"Basics: nothing is pre-filled. Choose every setting yourself: subscription, resource group (use <b>Create new</b>), a <b>unique name</b>, publish type, runtime, OS, region, plan (<b>Create new</b>), pricing tier, and zone redundancy. Then click <b>Next</b>."],[4,"Database: you can skip this. Click <b>Next</b>."],[4,"Deployment: choose continuous deployment and basic authentication yourself. Click <b>Next</b>."],[4,"Networking: choose public access and virtual network integration. Click <b>Next</b>."],[4,"Monitor + secure: choose Application Insights (optional, billed separately). Click <b>Next</b>."],[4,"Tags: optional. Click <b>Next: Review + create</b>."],[5,"Review the summary. If validation lists missing items, use the “Go to” links to fix them, then click <b>Create</b>."]];return t[tab]}
+ if(view=="deploying")return[5,"Azure is creating your resources. Wait for the deployment to finish."];
+ if(["dep","deps","rg","rgs"].includes(view))return[6,"Explore the resource group and the deployment tabs (Overview, Inputs, Outputs, Template). Then click <b>Go to resource</b>."];
+ const k=K[cur];
+ if(sec=="slots"){if(SLOTS.length<2)return[10,"Click <b>+ Add Slot</b> and give the slot a name, for example <b>staging</b>."];if(swapped)return["Done","Swap complete. Browse both slots to confirm the content moved. Try swapping back."];if(!K[SLOTS[1]].done)return[10,"Click your new slot’s name, open its <b>Deployment Center</b>, and upload a zip so it differs from production."];return[11,"Click <b>Swap</b>, choose a source and a target, then <b>Start swap</b>."]}
+ if(sec=="dc")return k.done?[9,"Deployed. Go to <b>Overview</b> and click <b>Browse</b>, then open <b>Deployment slots</b> in the left menu."]:[8,"Choose <b>Manual Deployment (Push)</b>, add a .zip file, and click <b>Upload</b>."];
+ if(cur!="production")return[10,"This is the slot’s Overview. Open its <b>Deployment Center</b> to upload a zip."];
+ return K.production.done?[9,"Click <b>Browse</b> to see your site. Then open <b>Deployment slots</b> in the left menu."]:[7,"Open <b>Deployment &gt; Deployment Center</b> in the left menu."]}
+function coach(){const [n,t]=hint();$("#coach").style.display=hints?"flex":"none";$("#coach").innerHTML=`<span class="n">${typeof n=="number"?"Step "+n+" of 11":n}</span><span>${t}</span><button onclick="hints=false;coach()" title="Hide guide">✕</button>`}
+function render(){const f={home,all:home,list,create,deploying,dep,deps,rg,rgs,res}[view];$("#v").innerHTML=f();if(view=="create"&&tab==0)nmv();coach()}
+function home(){return `<div class="wrap"><h1>Welcome to Azure!</h1><p class="mut">Sandbox simulator. Nothing here costs money.</p>
+<h2>Azure services</h2><div class="tiles">${SV.slice(0,8).map(s=>`<div class="tile" onclick="pick('${s[0]}')"><i>${s[1]}</i>${s[0]}</div>`).join("")}<div class="tile" onclick="go('all')"><i>›</i>More services</div></div>
+${view=="all"?`<h2>All services</h2><div class="tiles">${SV.map(s=>`<div class="tile" onclick="pick('${s[0]}')"><i>${s[1]}</i>${s[0]}</div>`).join("")}</div>`:""}
+<div class="bar mut" style="margin-top:20px"><label><input type="checkbox" ${hints?"checked":""} onchange="hints=this.checked;coach()"> Show step-by-step guide</label></div></div>`}
+function list(){return `<div class="wrap"><div class="mut"><span class="crumb" onclick="go('home')">Home</span> &gt;</div><h1>App Services</h1><div class="mut">Default Directory</div>
+<div class="bar"><div class="menu"><button class="btn" onclick="$('#cm').style.display=$('#cm').style.display=='block'?'none':'block'">+ Create ▾</button><div class="pop" id="cm" style="display:none"><div onclick="newApp()">Web App</div><div onclick="na()">Web App + Database</div><div onclick="na()">Static Web App</div></div></div><button class="btn s" onclick="na()">Manage view</button><button class="btn s" onclick="na()">Refresh</button></div>
+<div class="card">${created?`<table><tr><th>Name</th><th>Status</th><th>Location</th><th>Resource group</th></tr><tr><td><span class="crumb" onclick="sec='overview';go('res')">${S.name}</span></td><td class="ok">Running</td><td>${S.region}</td><td>${S.rg}</td></tr></table>`:`<div style="text-align:center;padding:30px"><div style="font-size:40px">🌐</div><b>No App Services to display</b><p class="mut">Create a web app to host your Python code.</p><button class="btn" onclick="newApp()">Create</button></div>`}</div></div>`}
+function newApp(){tab=0;go("create")}
+function create(){const T=tab,c=[basics,dbT,depT,netT,monT,tagT,revT][T]();
+return `<div class="wrap"><h1>Create Web App</h1>
+<div class="tabs">${TABS.map((t,i)=>`<a class="${i==T?"on":""}" onclick="tab=${i};render()">${t}</a>`).join("")}</div>${c}
+<div class="foot">${T==6?`<button class="btn" ${missing().length?"disabled":""} onclick="deploy()">Create</button>`:`<button class="btn" onclick="tab=${T+1};render();scrollTo(0,0)">${T==5?"Next : Review + create":"Next : "+TABS[T+1]+" &gt;"}</button>`}${T>0?`<button class="btn s" onclick="tab=${T-1};render()">&lt; Previous</button>`:""}</div></div>`}
+function basics(){const e=nameErr();return `<p class="mut" style="max-width:800px">App Service Web Apps lets you quickly build, deploy, and scale enterprise-grade web, mobile, and API apps running on any platform.</p>
+<h2>Project Details</h2><p class="mut">Select a subscription to manage deployed resources and costs. Use resource groups like folders to organize and manage all your resources.</p>
+${row("Subscription",sel("sub",[SUB]).replace("onchange=\"set('sub',this.value)\"",""),1)}
+${row("Resource Group",`<select class="in" onchange="S.rg=this.value;render()"><option value="">Select resource group</option>${RGL.map(x=>`<option value="${x}" ${S.rg==x?"selected":""}>(New) ${x}</option>`).join("")}</select> <span class="crumb" onclick="newRG()">Create new</span>`,1)}
+<h2>Instance Details</h2>
+${row("Name",`<input class="in ${e&&S.name?"bad":""}" id="nm" value="${S.name}" placeholder="Enter a unique name" oninput="S.name=this.value.trim();nmv()"><div class="mut" id="hn"></div><div class="err" id="ne"></div>`,1)}
+${row("Publish",radios("publish",["Code","Container"]),1)}
+${row("Runtime stack",sel("rt",["Python 3.15 (Preview)","Python 3.13","Python 3.12","Node 22 LTS",".NET 9 (STS)","Java 21"]),1)}
+${row("Operating System",radios("os",["Linux","Windows"]),1)}
+${row("Region",sel("region",["East US","West US 3","Central India","South India","West Europe"]),1)}
+<div class="mut">Not finding your App Service Plan? Try a different region or select your App Service Environment.</div>
+<h2>Pricing plans</h2><p class="mut">App Service plan pricing tier determines the location, features, cost and compute resources associated with your app.</p>
+${row((S.os||"Operating system")+" Plan ("+(S.region||"region")+")",`<select class="in" onchange="S.plan=this.value;render()"><option value="">Select plan</option>${planOpts()}</select> <span class="crumb" onclick="newPlan()">Create new</span>`,1)}
+${row("Pricing plan",sel("sku",Object.keys(SKU)),1)}
+<h2>Zone redundancy</h2><p class="mut" style="max-width:800px">An App Service plan can be deployed as a zone redundant service in the regions that support it. You can decrease the instance count after the plan is created.</p>
+${row("Zone redundancy",radios("zone",["Enabled","Disabled"])+`<div class="mut">${!S.zone?"":S.zone=="Enabled"?"Enabled: the minimum instance count will be two.":"Disabled: the minimum instance count will be one."}</div>`)}
+<div class="note"><b>Managed Instance.</b> Try Managed Instance on App Service to deploy and configure application dependencies, access registries, and use familiar troubleshooting tools through RDP over Azure Bastion.</div>`}
+function nmv(){const e=nameErr(),h=$("#hn");if(!h)return;h.textContent=S.name&&!e?host():"";$("#ne").textContent=S.name?e:"";$("#nm").classList.toggle("bad",!!(S.name&&e))}
+const dbT=()=>`<div class="note">Once database is enabled, a new VNet and related networking resources will be created automatically.</div>${row("Create a Database",`<label><input type="checkbox" ${S.db?"checked":""} onchange="set('db',this.checked)"> Add a database to this web app</label>`)}${S.db?`<div class="warn">Database creation isn’t simulated in this lab. Leave it unchecked.</div>`:""}`;
+const depT=()=>`<h2>Continuous deployment settings</h2><p class="mut">Set up continuous deployment to easily deploy code from your GitHub repository via GitHub Actions.</p>
+${row("Continuous deployment",radios("cd",["Disable","Enable"]))}
+${S.cd=="Enable"?`<h2>GitHub settings</h2>${["GitHub account","Organization","Repository","Branch"].map(x=>row(x,`<select class="in"><option>Select ${x.toLowerCase()}</option></select>`)).join("")}<div class="note">Complete the Basics tab and the form above to preview the GitHub Actions workflow file.</div>`:""}
+<h2>Authentication settings</h2><p class="mut">Choose if you would like to allow basic authentication to deploy code to your app.</p>${row("Basic authentication",radios("basic",["Disable","Enable"]))}`;
+const netT=()=>`<p class="mut" style="max-width:800px">By default, your app is open to the internet and cannot reach into a virtual network. These aspects can also be changed after the app is provisioned.</p>${row("Enable public access",radios("pub",["On","Off"]))}${row("Enable virtual network integration",radios("vnet",["On","Off"]))}`;
+const monT=()=>`<p class="mut">The following features are optional and billed separately.</p><h2>Application Insights</h2><p class="mut" style="max-width:800px">Azure Monitor application insights is an Application Performance Management (APM) service. Your bill is based on the amount of data used and your retention settings.</p>${row("Enable Application Insights",radios("ai",["No","Yes"]))}
+<h2>Microsoft Defender for Cloud</h2><p class="mut" style="max-width:800px">Defender for App Service monitors logs, requests, and VM instances to detect threats.</p>${row("Enable Defender for App Service",`<label><input type="checkbox" ${S.def?"checked":""} onchange="set('def',this.checked)"> Enable</label>`)}`;
+const tagT=()=>`<p class="mut" style="max-width:800px">Tags are name/value pairs that enable you to categorize resources and view consolidated billing.</p><table style="max-width:600px"><tr><th>Name</th><th>Value</th><th>Resource</th></tr>${S.tags.map((t,i)=>`<tr><td><input class="in" value="${t.n}" oninput="S.tags[${i}].n=this.value" onchange="addTag(${i})"></td><td><input class="in" value="${t.v}" oninput="S.tags[${i}].v=this.value"></td><td>3 selected</td></tr>`).join("")}</table>`;
+function addTag(i){if(i==S.tags.length-1&&S.tags[i].n){S.tags.push({n:"",v:""});render()}}
+function revT(){const m=missing();return `${m.length?`<div class="warn"><b>Validation failed.</b> Fix these before creating:<ul>${m.map(x=>`<li>${x[0]} <span class="crumb" onclick="tab=${x[1]};render()">Go to ${TABS[x[1]]}</span></li>`).join("")}</ul></div>`:`<div class="note ok">Validation passed.</div>`}
+<div class="card" style="max-width:760px"><h2 style="margin-top:0">Summary</h2><b>Web App</b> by Microsoft<br>${S.sku.split(" (")[0]} sku<br><b>Estimated price: ${S.sku?price():"—"} USD/Month</b>
+${S.basic=="Disable"?`<div class="warn">Basic authentication for this app is currently disabled and may impact deployments.</div>`:""}
+<h2>Details</h2><table>${[["Subscription",S.sub?SUBID:""],["Resource Group",S.rg],["Name",S.name||"—"],["Secure unique default hostname","Enabled"],["Publish",S.publish],["Runtime stack",S.rt],["App Service Plan (New)",S.plan],["Operating System",S.os],["Region",S.region],["SKU",S.sku.split(" (")[0]],["Memory",(S.sku.match(/\d[\d.]* GB/)||["Shared"])[0]],["Application Insights",S.ai=="Yes"?"Enabled":"Not enabled"],["Basic authentication",S.basic?S.basic+"d":""],["Continuous deployment",S.cd=="Enable"?"Enabled":"Not enabled / Set up after app creation"]].map(r=>`<tr><td class="mut" style="width:45%">${r[0]}</td><td>${r[1]||"—"}</td></tr>`).join("")}</table></div>`}
+const mk=()=>({st:[0,0,0],log:"",busy:false,done:false,file:null,mode:"manual"});
+const K={production:mk()},DN="Microsoft.Web-WebApp-Portal-e20e26a9-989b";
+let cur="production",SLOTS=["production"],swapped=false,vc=0,DT="",dtab=0;
+function host(x=cur){return S.name+(x=="production"?"":"-"+x)+"-"+HASH+".eastus-01.azurewebsites.net"}
+const crumbs=a=>`<div class="mut"><span class="crumb" onclick="go('home')">Home</span> &gt; ${a}</div>`;
+function deploy(){created=true;DT=new Date().toLocaleString();SLOTS=["production"];swapped=false;dtab=0;for(const q in K)delete K[q];K.production=mk();cur="production";go("deploying");setTimeout(()=>{if(view=="deploying")go("dep")},3800)}
+function deploying(){return `<div class="wrap"><h1>${DN} | Overview</h1><div class="card" style="margin-top:12px"><b>Deployment is in progress</b><div class="prog" style="margin:12px 0"><span style="width:70%"></span></div><table><tr><th>Resource</th><th>Type</th><th>Status</th></tr><tr><td>${S.plan}</td><td>Microsoft.Web/serverFarms</td><td>Created</td></tr><tr><td>${S.name}</td><td>Microsoft.Web/sites</td><td>Creating…</td></tr></table></div></div>`}
+function rgs(){return `<div class="wrap">${crumbs("Resource groups")}<h1>Resource groups</h1><div class="card">${created?`<table><tr><th>Name</th><th>Subscription</th><th>Location</th></tr><tr><td><span class="crumb" onclick="go('rg')">${S.rg}</span></td><td>${SUB}</td><td>${S.region}</td></tr></table>`:`<div style="text-align:center;padding:24px"><b>No resource groups to display</b><p class="mut">A resource group is created when your web app deployment runs.</p></div>`}</div></div>`}
+function rg(){if(!created)return rgs();const r=[[S.name,"App Service","Microsoft.Web/sites","production"],[S.plan,"App Service plan","Microsoft.Web/serverfarms"],...SLOTS.slice(1).map(x=>[S.name+"/"+x,"App Service (Slot)","Microsoft.Web/sites/slots",x])];
+return `<div class="wrap">${crumbs(`<span class="crumb" onclick="go('rgs')">Resource groups</span> &gt; ${S.rg}`)}<h1>${S.rg}</h1><div class="ess"><div><span class="mut">Subscription:</span> ${SUB}</div><div><span class="mut">Location:</span> ${S.region}</div></div>
+<h2>Resources</h2><div class="card"><table><tr><th>Name</th><th>Type</th><th>Resource type</th></tr>${r.map(x=>`<tr><td>${x[3]?`<span class="crumb" onclick="cur='${x[3]}';sec='overview';go('res')">${x[0]}</span>`:x[0]}</td><td>${x[1]}</td><td>${x[2]}</td></tr>`).join("")}</table></div>
+<h2>Deployments</h2><div class="card"><span class="crumb" onclick="go('deps')">1 Succeeded</span></div></div>`}
+function deps(){if(!created)return rgs();return `<div class="wrap">${crumbs(`<span class="crumb" onclick="go('rgs')">Resource groups</span> &gt; <span class="crumb" onclick="go('rg')">${S.rg}</span> &gt; Deployments`)}<h1>${S.rg} | Deployments</h1><div class="card"><table><tr><th>Deployment name</th><th>Status</th><th>Last modified</th></tr><tr><td><span class="crumb" onclick="dtab=0;go('dep')">${DN}</span></td><td class="ok">Succeeded</td><td>${DT}</td></tr></table></div></div>`}
+function dep(){if(!created)return rgs();const sk=(S.sku.match(/\b[FBSP]\d\w*/)||[""])[0];
+const tpl={"$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",resources:[{type:"Microsoft.Web/serverfarms",name:S.plan,location:S.region,sku:{name:sk},kind:S.os.toLowerCase()},{type:"Microsoft.Web/sites",name:S.name,location:S.region,properties:{serverFarmId:S.plan,siteConfig:{runtime:S.rt},httpsOnly:true}}]};
+const inp=[["name",S.name],["location",S.region],["sku",sk],["runtimeStack",S.rt],["operatingSystem",S.os],["serverFarmName",S.plan],["zoneRedundant",S.zone=="Enabled"],["basicAuthentication",S.basic],["publicNetworkAccess",S.pub]];
+const body=[`<div class="card"><h2 class="ok" style="margin-top:0">✔ Your deployment is complete</h2><p class="mut">Deployment name: ${DN}<br>Subscription: ${SUB}<br>Resource group: ${S.rg}<br>Start time: ${DT}</p><div class="bar"><button class="btn" onclick="cur='production';sec='overview';go('res')">Go to resource</button><button class="btn s" onclick="go('rg')">Go to resource group</button></div></div><h2>Deployment details</h2><div class="card"><table><tr><th>Resource</th><th>Type</th><th>Status</th></tr><tr><td>${S.plan}</td><td>Microsoft.Web/serverFarms</td><td>OK</td></tr><tr><td>${S.name}</td><td>Microsoft.Web/sites</td><td>OK</td></tr></table></div>`,
+`<div class="card"><table><tr><th>Parameter</th><th>Value</th></tr>${inp.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("")}</table></div>`,`<div class="card mut">No outputs for this deployment.</div>`,`<pre style="max-height:420px">${JSON.stringify(tpl,null,2)}</pre>`][dtab];
+return `<div class="wrap">${crumbs(`<span class="crumb" onclick="go('rgs')">Resource groups</span> &gt; <span class="crumb" onclick="go('rg')">${S.rg}</span> &gt; <span class="crumb" onclick="go('deps')">Deployments</span>`)}<h1>${DN} | ${["Overview","Inputs","Outputs","Template"][dtab]}</h1><div class="tabs">${["Overview","Inputs","Outputs","Template"].map((t,i)=>`<a class="${i==dtab?"on":""}" onclick="dtab=${i};render()">${t}</a>`).join("")}</div>${body}</div>`}
+const MENU=[["Overview","overview"],["Activity log"],["Access control (IAM)"],["Tags"],["Diagnose and solve problems"],["Microsoft Defender for Cloud"],["Events (preview)"],["AI"],["Resource visualizer"],"Deployment",["Deployment slots","slots"],["Deployment Center","dc"],"Settings","Performance","App Service plan","Development Tools","Monitoring","Automation","Support + troubleshooting"];
+function res(){return `<div class="split"><div class="side"><b style="font-size:15px;color:var(--tx)">${S.name}${cur!="production"?"-"+cur:""}<br><span class="mut" style="font-weight:400;font-size:12px">${cur=="production"?"Web App":"Web App (Slot)"}</span></b>${MENU.map(m=>typeof m=="string"?`<b>${m}</b>`:`<div class="${m[1]==sec?"on":""}" onclick="${m[1]?`sec='${m[1]}';render()`:"na()"}">${m[0]}</div>`).join("")}</div><div class="main">${crumbs(`<span class="crumb" onclick="go('list')">App Services</span> &gt; <span class="crumb" onclick="cur='production';sec='overview';render()">${S.name}</span>${cur!="production"?" &gt; "+cur:""}`)}${sec=="dc"?dc():sec=="slots"?slotsP():ov()}</div></div>`}
+function ov(){return `<h1>${S.name}${cur!="production"?"-"+cur:""}</h1><div class="bar"><button class="btn s" onclick="browse('${cur}')">🌐 Browse</button><button class="btn s" onclick="na()">Stop</button><button class="btn s" onclick="na()">Restart</button></div>
+<div class="ess"><div><span class="mut">Resource group:</span> <span class="crumb" onclick="go('rg')">${S.rg}</span></div><div><span class="mut">Status:</span> <span class="ok">Running</span></div><div><span class="mut">Location:</span> ${S.region}</div><div><span class="mut">Subscription:</span> ${SUB}</div><div><span class="mut">Default domain:</span> <span class="crumb" onclick="browse('${cur}')">${host()}</span></div><div><span class="mut">Plan:</span> ${S.plan} (${S.sku.split(" (")[0]})</div></div>
+<div class="card" style="margin-top:16px">${site(cur)}<div style="text-align:center"><button class="btn" onclick="sec='dc';render()">Open Deployment Center</button></div></div>`}
+function site(x){const k=K[x];return k.done?`<div class="page"><div style="font-size:48px">🐍</div><h1>Hello from Python on Azure!</h1><p class="mut">Content: <b>${k.file.name}</b><br>Served from the ${x} slot hostname.</p></div>`:`<div class="page"><div class="mut">Microsoft Azure</div><h1>Your Python web app is running<br>and waiting for your content.</h1><p class="mut">Everything is wired up and ready to go. If you have already deployed, refresh in a few moments and your content will appear here.</p><p class="mut">Built with Python · Powered by Azure App Service on Linux</p></div>`}
+function browse(x){const m=document.createElement("div");m.className="modal";m.onclick=e=>{if(e.target==m)m.remove()};m.innerHTML=`<div class="browser"><div class="url">🔒 https://${host(x)} <button class="btn s" style="margin-left:auto" onclick="this.closest('.modal').remove()">Close</button></div>${site(x)}</div>`;document.body.append(m)}
+function dc(){const k=K[cur];return `<h1>${S.name}${cur!="production"?"-"+cur:""} | Deployment Center</h1>${cur=="production"?`<div class="warn">You are now in the production slot, which is not recommended for setting up CI/CD.</div>`:`<div class="note">You are in the <b>${cur}</b> slot. Deploy and test here before swapping.</div>`}
+<div class="tabs"><a class="${k.mode!="ci"?"on":""}" onclick="K[cur].mode='manual';render()">Manual Deployment (Push)</a><a class="${k.mode=="ci"?"on":""}" onclick="K[cur].mode='ci';render()">Continuous Deployment (CI/CD)</a></div>
+${k.mode=="ci"?`<div class="note">Continuous deployment from GitHub isn’t simulated. Choose Manual Deployment (Push).</div>`:`${row("Source",`<select class="in"><option>Deploy your application by uploading a zip file</option></select>`)}
+<div class="drop ${k.file?"on":""}" onclick="$('#f').click()"><input type="file" id="f" accept=".zip" hidden onchange="pickF(this.files[0])">${k.file?`📦 <b>${k.file.name}</b> (${k.file.size} bytes)`:"Drag and drop a .zip file here, or click to browse<br><span class='mut'>Maximum file size: 1.0 GB</span>"}</div>
+<div class="bar"><button class="btn" ${!k.file||k.busy?"disabled":""} onclick="up()">Upload</button><button class="btn s" onclick="K[cur].file={name:'sample-app-v'+(++vc)+'.zip',size:2048};render()">Use sample app.zip</button></div>
+${k.busy||k.st[2]==2?`<h2>Deployment status</h2>${["Upload","Build","Deploy"].map((n,i)=>`<div class="st"><span class="dot ${k.st[i]==2?"done":k.st[i]==1?"run":""}">${k.st[i]==2?"✓":""}</span>${n}${k.st[i]==2?" complete":k.st[i]==1?" in progress…":"<span class='mut'> Waiting…</span>"}</div>`).join("")}<h2>Deployment logs</h2><pre>${k.log}</pre>`:""}`}`}
+function pickF(f){if(!f)return;if(!/\.zip$/i.test(f.name)){toast("Only .zip files are accepted.");return}K[cur].file={name:f.name,size:f.size};render()}
+function up(){const k=K[cur],c=cur;Object.assign(k,{busy:true,done:false,st:[1,0,0],log:"Uploading "+k.file.name+"…\n"});render();
+[[1500,"Upload complete. Starting build…\nOryx: detected Python app, installing requirements.txt…\n",[2,1,0]],[3300,"Build succeeded.\nStarting deployment to /home/site/wwwroot…\n",[2,2,1]],[4800,"Deployment successful. Restarting site…\nSite is up: https://"+host(c)+"\n",[2,2,2]]].forEach(([t,l,st],i)=>setTimeout(()=>{k.st=st;k.log+=l;if(i==2){k.busy=false;k.done=true}if(view=="res"&&sec=="dc"&&cur==c)render()},t))}
+function slotsP(){return `<h1>${S.name} | Deployment slots</h1><p class="mut">Slots are live apps with their own hostnames. Deploy to a slot, test it, then swap it into production.</p>
+<div class="bar"><button class="btn" onclick="addSlot()">+ Add Slot</button><button class="btn s" onclick="swapUI()">⇄ Swap</button></div>${swapped?`<div class="note ok">Last swap completed at ${swapped}.</div>`:""}
+<div class="card"><table><tr><th>Name</th><th>Status</th><th>App Service plan</th><th>Traffic %</th><th>Content</th></tr>${SLOTS.map(x=>`<tr><td><span class="crumb" onclick="cur='${x}';sec='overview';render()">${S.name}${x=="production"?"":"-"+x}</span>${x=="production"?" <span class='mut'>(Production)</span>":""}</td><td class="ok">Running</td><td>${S.plan}</td><td>${x=="production"?100:0}</td><td>${K[x].done?K[x].file.name:"Default page"}</td></tr>`).join("")}</table></div>`}
+function addSlot(){if(/Free|Basic/.test(S.sku)){toast("Deployment slots need the Standard tier or higher. Your plan is "+S.sku.split(" (")[0]+".");return}
+ask("Add a slot","Name",(v,c)=>{SLOTS.push(v);K[v]=mk();K[v].clone=c;render()},v=>!/^[a-z0-9-]{2,59}$/.test(v)?"Use 2–59 lowercase letters, numbers, or hyphens.":SLOTS.includes(v)?"That slot already exists.":"",`<p class="mut">Hostname: ${S.name}-<i>slot name</i>-${HASH}…</p><label>Clone settings from</label><select class="in" id="cl" style="max-width:none;margin:4px 0 8px"><option>Do not clone settings</option><option>${S.name}</option></select>`)}
+function swapUI(){if(SLOTS.length<2){toast("Add a slot first.");return}const o=SLOTS.map(x=>`<option>${x}</option>`).join(""),m=document.createElement("div");m.className="modal";
+m.innerHTML=`<div class="card" style="width:min(460px,100%)"><h2 style="margin-top:0">Swap</h2><p class="mut">Choose which slot goes live.</p><label>Source</label><select class="in" id="ss" style="max-width:none;margin:4px 0 8px"><option value="">Select source</option>${o}</select><label>Target</label><select class="in" id="tt" style="max-width:none;margin:4px 0 8px"><option value="">Select target</option>${o}</select><div class="err" id="se"></div><div class="bar"><button class="btn" id="sg">Start swap</button><button class="btn s" id="sc">Cancel</button></div></div>`;document.body.append(m);
+m.querySelector("#sc").onclick=()=>m.remove();
+m.querySelector("#sg").onclick=()=>{const a=m.querySelector("#ss").value,b=m.querySelector("#tt").value,e=m.querySelector("#se");if(!a||!b){e.textContent="Select both a source and a target.";return}if(a==b){e.textContent="Source and target must be different.";return}
+m.querySelector(".card").innerHTML=`<h2 style="margin-top:0">Swapping ${a} into ${b}…</h2><div class="prog"><span id="sp" style="width:10%"></span></div><pre id="sl">Applying ${b} settings to ${a}…\n</pre>`;
+[[900,"Restarting "+a+" and warming up…\n",45],[1900,"Switching routing rules…\n",80],[2800,"Swap complete.\n",100]].forEach(([t,x,q],i)=>setTimeout(()=>{m.querySelector("#sl").textContent+=x;m.querySelector("#sp").style.width=q+"%";if(i==2){const A=K[a],B=K[b];[A.done,B.done]=[B.done,A.done];[A.file,B.file]=[B.file,A.file];swapped=new Date().toLocaleTimeString();setTimeout(()=>{m.remove();render()},700)}},t))}}
+render();
+</script></body></html>
